@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>derroga-app</title>
+  <script src="jquery.min.js"></script>
+</head>
+<body>
+  <label for="cisnum" style="display:block;">Informe o CIS:</label>
+  <input type="text" id="cisnum" placeholder="Informe o CIS">
+  <label for="resp" style="display:block;">Informe o Responsável:</label>
+  <input type="text" id="resp">
+  <label style="display:block;" for="downloadlink">Cole o texto do "warehouse":</label>
+  <textarea name="warehousebox" id="warehousebox" style="width:200px;"></textarea>
+  <button id="btn-xml" style="display:block;">Create XML</button></br>
+  <a download="derroga.xml" id="downloadlink" style="display:none;">Download</a>
+
+  <script>
+    $(document).ready(function() {
+      $('#btn-xml').click(function() {
+        let cisnum = ""
+        let resp = ""
+        
+        cisnum = $('#cisnum').val()
+        resp = $('#resp').val()
+
+        const v = textHandler()
+        const xml = createDerroga(v, cisnum, resp)
+        $('#downloadlink').attr('href', createFile(xml))
+        $('#downloadlink').show()
+
+        //extra
+        
+      })
+
+      function createFile(content) {
+        const data = new Blob([content], {type:'text/xml'})
+        //console.log(window.URL.createObjectURL(data))
+        return window.URL.createObjectURL(data)
+      }
+
+      let array = []
+      function textHandler() {
+        let text = $('#warehousebox').val()
+        array = text.replace( / /g, '').split("\n")
+        
+        for(let i=0;i<array.length;i++) {
+          array[i] = array[i].toString().substring(5, array[i].indexOf('-'))
+        }
+
+        return array
+      }
+
+      function createDerroga(v, cisnum, resp) {
+        let operations = checkedData(v, resp)
+        const d = new Date()
+        let ano = d.getFullYear()
+        let mes = d.getMonth()+1
+        let dia = d.getDate()
+
+        let hora = d.getHours()
+        let min = d.getMinutes()
+        let sec = d.getSeconds()
+
+        const xml = `
+<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${ano}-${mes}-${dia}T${hora}:${min}:${sec}">
+\t\t<PROCESSING_CHECK_SECTION>
+${operations}
+\t\t</PROCESSING_CHECK_SECTION>
+</FIELD_DATA>`
+        
+        return xml
+      }
+
+      function checkedData(v, resp) {
+        let texto = ""
+        for(let i=0;i<v.length;i++) {
+          texto +=  `\t\t\t<CHECKED_DATA OPCODE="${v[i]}" OPTYPE="GEN" OPERATOR="${resp}">OK</CHECKED_DATA>\n`
+        }
+
+        return texto
+      }
+    })
+  </script>
+</body>
+</html>
