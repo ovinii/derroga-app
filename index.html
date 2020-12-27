@@ -56,14 +56,8 @@
       function createDerroga(operations, cisnum, resp) {
         let op = checkedData(operations, resp)
         const d = new Date()
-        let ano = d.getFullYear()
-        let mes = d.getMonth()+1
-        let dia = d.getDate()
-        let hora = d.getHours()
-        let min = d.getMinutes()
-        let sec = d.getSeconds()
 
-        let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${ano}-${mes}-${dia}T${hora}:${min}:${sec}">`
+        let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}">`
         let processing = `\n\t<PROCESSING_CHECK_SECTION>\n${op}\n\t</PROCESSING_CHECK_SECTION>`
         let footer = `\n</FIELD_DATA>`
         
