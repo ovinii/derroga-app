@@ -20,18 +20,15 @@
   <a download="derroga.xml" id="downloadlink" style="display:none;">Download</a>
   <script>
     $(document).ready(function() {
-
       $('#btn-xml').click(function() {
         let cisnum = $('#cisnum').val() //cis
         let resp = $('#resp').val() //responsável
         let warehouse = $('#warehousebox').val() //conteúdo da warehouse
         let derroga = $('#derroga').val() //conteúdo da planilha de derroga
 
-        const validatedText = warehouseHandler(warehouse)
-        console.log(validatedText);
-        let xmlValidated = compareOperations(validatedText, derroga)
-        console.log(xmlValidated)
-        //xmlValidated = createDerroga(v, cisnum, resp)
+        const whValidated = warehouseHandler(warehouse)
+        let opValidated = compareOperations(whValidated, derroga)
+        xmlValidated = createDerroga(opValidated, cisnum, resp)
 
         $('#downloadlink').attr('href', createFile(xmlValidated))
         $('#downloadlink').show()
@@ -46,50 +43,44 @@
       }
       
       function compareOperations(warehouse, derroga) {
-        derroga = derroga.split('\n')
-        //console.log(warehouse);
-        for(let x=0;x<warehouse.length;x++) {
-          if(warehouse.indexOf(derroga[x]) === -1) {
-            warehouse = warehouse.splice(x, 1)
-            }
-            
+        derroga = derroga.split('\n') //transformando a derroga em vetor
+        let xml = []
+        for(let operation of warehouse) {
+          if(derroga.indexOf(operation) != -1) {
+            xml.push(operation)
           }
-          //console.log(warehouse)
         }
-
-      function createFile(file) {
-        const data = new Blob([file], {type:'text/xml'})
-        return window.URL.createObjectURL(data)
+          return xml
       }
-
-      function createDerroga(v, cisnum, resp) {
-        let operations = checkedData(v, resp)
+      
+      function createDerroga(operations, cisnum, resp) {
+        let op = checkedData(operations, resp)
         const d = new Date()
         let ano = d.getFullYear()
         let mes = d.getMonth()+1
         let dia = d.getDate()
-
         let hora = d.getHours()
         let min = d.getMinutes()
         let sec = d.getSeconds()
 
-        const xml = `
-<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${ano}-${mes}-${dia}T${hora}:${min}:${sec}">
-\t\t<PROCESSING_CHECK_SECTION>
-${operations}
-\t\t</PROCESSING_CHECK_SECTION>
-</FIELD_DATA>`
+        let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${ano}-${mes}-${dia}T${hora}:${min}:${sec}">`
+        let processing = `\n\t<PROCESSING_CHECK_SECTION>\n${op}\n\t</PROCESSING_CHECK_SECTION>`
+        let footer = `\n</FIELD_DATA>`
         
-        return xml
+        return header+processing+footer
       }
 
-      function checkedData(v, resp) {
-        let texto = ""
-        for(let i=0;i<v.length;i++) {
-          texto +=  `\t\t\t<CHECKED_DATA OPCODE="${v[i]}" OPTYPE="GEN" OPERATOR="${resp}">OK</CHECKED_DATA>\n`
+      function checkedData(operations, resp) {
+        let text = ""
+        for(let operation of operations) {
+          text += `\t\t<CHECKED_DATA OPCODE="${operation}" OPTYPE="GEN" OPERATOR="${resp}">OK</CHECKED_DATA>\n`
         }
+        return text
+      }
 
-        return texto
+      function createFile(file) {
+        const data = new Blob([file], {type:'text/xml'})
+        return window.URL.createObjectURL(data)
       }
     })
   </script>
