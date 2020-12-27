@@ -8,48 +8,58 @@
 </head>
 <body>
   <label for="cisnum" style="display:block;">Informe o CIS:</label>
-  <input type="text" id="cisnum" placeholder="Informe o CIS">
+  <input type="text" id="cisnum">
   <label for="resp" style="display:block;">Informe o Responsável:</label>
   <input type="text" id="resp">
   <label style="display:block;" for="downloadlink">Cole o texto do "warehouse":</label>
   <textarea name="warehousebox" id="warehousebox" style="width:200px;"></textarea>
+  </br>
+  <label for="derroga" style="display:block;">Informe as operações derrogadas:</label>
+  <textarea id="derroga" style="width:200px;"></textarea>
   <button id="btn-xml" style="display:block;">Create XML</button></br>
   <a download="derroga.xml" id="downloadlink" style="display:none;">Download</a>
-
   <script>
     $(document).ready(function() {
+
       $('#btn-xml').click(function() {
-        let cisnum = ""
-        let resp = ""
-        
-        cisnum = $('#cisnum').val()
-        resp = $('#resp').val()
+        let cisnum = $('#cisnum').val() //cis
+        let resp = $('#resp').val() //responsável
+        let warehouse = $('#warehousebox').val() //conteúdo da warehouse
+        let derroga = $('#derroga').val() //conteúdo da planilha de derroga
 
-        const v = textHandler()
-        const xml = createDerroga(v, cisnum, resp)
-        $('#downloadlink').attr('href', createFile(xml))
+        const validatedText = warehouseHandler(warehouse)
+        console.log(validatedText);
+        let xmlValidated = compareOperations(validatedText, derroga)
+        console.log(xmlValidated)
+        //xmlValidated = createDerroga(v, cisnum, resp)
+
+        $('#downloadlink').attr('href', createFile(xmlValidated))
         $('#downloadlink').show()
-
-        //extra
-        
       })
 
-      function createFile(content) {
-        const data = new Blob([content], {type:'text/xml'})
-        //console.log(window.URL.createObjectURL(data))
-        return window.URL.createObjectURL(data)
-      }
-
-      let array = []
-      function textHandler() {
-        let text = $('#warehousebox').val()
-        array = text.replace( / /g, '').split("\n")
-        
+      function warehouseHandler(warehouse) {
+        let array = warehouse.replace( / /g, '').split("\n") //remove espaços e quebra linhas
         for(let i=0;i<array.length;i++) {
           array[i] = array[i].toString().substring(5, array[i].indexOf('-'))
         }
-
         return array
+      }
+      
+      function compareOperations(warehouse, derroga) {
+        derroga = derroga.split('\n')
+        //console.log(warehouse);
+        for(let x=0;x<warehouse.length;x++) {
+          if(warehouse.indexOf(derroga[x]) === -1) {
+            warehouse = warehouse.splice(x, 1)
+            }
+            
+          }
+          //console.log(warehouse)
+        }
+
+      function createFile(file) {
+        const data = new Blob([file], {type:'text/xml'})
+        return window.URL.createObjectURL(data)
       }
 
       function createDerroga(v, cisnum, resp) {
