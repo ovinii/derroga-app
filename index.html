@@ -14,7 +14,6 @@
   <input type="text" id="resp">
   <label style="display:block;" for="downloadlink">Cole o texto do "warehouse":</label>
   <textarea name="warehousebox" id="warehousebox" style="width:200px;"></textarea>
-  </br>
   <label for="derroga" style="display:block;">Informe as operações derrogadas:</label>
   <textarea id="derroga" style="width:200px;"></textarea>
   <button id="btn-xml" style="display:block;">Create XML</button></br>
@@ -47,8 +46,8 @@
         derroga = derroga.split('\n') //transformando a derroga em vetor
         let xml = []
         for(let operation of warehouse) {
-          if(derroga.indexOf(operation) != -1) {
-            xml.push(operation)
+          if(derroga.indexOf(operation) != -1) { // busca operação na lista de derroga
+            xml.push(operation) // se houver um "match" insere a operação no xml
           }
         }
           return xml
@@ -57,8 +56,15 @@
       function createDerroga(operations, cisnum, resp) {
         let op = checkedData(operations, resp)
         const d = new Date()
+        // trata horário -adiciona 0 na frente quando hora/min/seg forem menor que 10
+        let hours = d.getHours() < '10' ? '0' + d.getHours() : d.getHours()
+        let minutes = d.getMinutes() < '10' ? '0' + d.getMinutes() : d.getMinutes()
+        let seconds = d.getSeconds() < '10' ? '0' + d.getSeconds() : d.getSeconds()
+        // trata datas -adiciona 0 na frente quando mes/dia forem menor que 10
+        let month = d.getMonth()+1 < '10' ? '0' + d.getMonth()+1 : d.getMonth()+1
+        let day = d.getDate() < '10' ? '0' + d.getDate() : d.getDate()
 
-        let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}T${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}">`
+        let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${d.getFullYear()}-${month}-${day}T${hours}:${minutes}:${seconds}">`
         let processing = `\n\t<PROCESSING_CHECK_SECTION>\n${op}\n\t</PROCESSING_CHECK_SECTION>`
         let footer = `\n</FIELD_DATA>`
         
