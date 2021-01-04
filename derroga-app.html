@@ -61,7 +61,7 @@
         let minutes = d.getMinutes() < '10' ? '0' + d.getMinutes() : d.getMinutes()
         let seconds = d.getSeconds() < '10' ? '0' + d.getSeconds() : d.getSeconds()
         // trata datas -adiciona 0 na frente quando mes/dia forem menor que 10
-        let month = d.getMonth()+1 < '10' ? '0' + d.getMonth()+1 : d.getMonth()+1
+        let month = d.getMonth()+1 < '10' ? '0' + parseInt(d.getMonth()+1) : d.getMonth()+1
         let day = d.getDate() < '10' ? '0' + d.getDate() : d.getDate()
 
         let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${d.getFullYear()}-${month}-${day}T${hours}:${minutes}:${seconds}">`
