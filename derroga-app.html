@@ -10,6 +10,7 @@
 <body>
   <label for="cisnum" style="display:block;">Informe o CIS:</label>
   <input type="text" id="cisnum">
+  <p id="errMessage" style="display:none"></p>
   <label for="resp" style="display:block;">Informe o Responsável:</label>
   <input type="text" id="resp">
   <label style="display:block;" for="downloadlink">Cole o texto do "warehouse":</label>
@@ -26,7 +27,9 @@
         let warehouse = $('#warehousebox').val() //conteúdo da warehouse
         let derroga = $('#derroga').val() //conteúdo da planilha de derroga
 
-        const whValidated = warehouseHandler(warehouse)
+        const cisValidated = cisHandler()
+        const whValidated = warehouseHandler()
+        console.log(whValidated);
         let opValidated = compareOperations(whValidated, derroga)
         xmlValidated = createDerroga(opValidated, cisnum, resp)
 
@@ -34,12 +37,27 @@
         $('#downloadlink').show()
       })
 
-      function warehouseHandler(warehouse) {
-        let array = warehouse.replace( / /g, '').split("\n") //remove espaços e quebra linhas
-        for(let i=0;i<array.length;i++) {
-          array[i] = array[i].toString().substring(5, array[i].indexOf('-'))
-        }
-        return array
+      function cisHandler() {
+        const cisChecked = $('#cisnum').val().split(',')
+        cisChecked.forEach(cis => {
+          if(cis.length !== 7) {
+            $('#errMessage').attr('style', 'display:block; margin:0px; color:red;')
+            $('#errMessage').text("Cis inválido")
+            $('#cisnum').val("")
+          }
+        })
+
+        return cisChecked
+      }
+
+      function warehouseHandler() {
+        const warehouseChecked = $('#warehousebox').val().replace( / /g, '').split("\n") //remove espaços e quebra linhas
+
+        const results = warehouseChecked.map(warehouse => {
+          return warehouse.toString().substring(5, warehouse.indexOf('-'))
+        })
+
+        return results
       }
       
       function compareOperations(warehouse, derroga) {
