@@ -22,14 +22,14 @@
   <script>
     $(document).ready(function() {
       $('#btn-xml').click(function() {
-        let cisnum = $('#cisnum').val() //cis
-        let resp = $('#resp').val() //responsável
-        let warehouse = $('#warehousebox').val() //conteúdo da warehouse
-        let derroga = $('#derroga').val() //conteúdo da planilha de derroga
+        const cisnum = $('#cisnum').val() //cis;
+        const resp = $('#resp').val() //responsável;
+        const warehouse = $('#warehousebox').val() //ctrl-v da warehouse;
+        const derroga = $('#derroga').val() //planilha de derroga;
 
         const cisValidated = cisHandler()
         const whValidated = warehouseHandler()
-        console.log(whValidated);
+        
         let opValidated = compareOperations(whValidated, derroga)
         xmlValidated = createDerroga(opValidated, cisnum, resp)
 
@@ -37,6 +37,7 @@
         $('#downloadlink').show()
       })
 
+      //transforma input de cis em vetor caso possua o separador "," e exibe erro caso tamanho do cis seja != de 7 carct;
       function cisHandler() {
         const cisChecked = $('#cisnum').val().split(',')
         cisChecked.forEach(cis => {
@@ -50,8 +51,9 @@
         return cisChecked
       }
 
+      //transforma input da warehouse removendo espaços e separando as operações em vetor;
       function warehouseHandler() {
-        const warehouseChecked = $('#warehousebox').val().replace( / /g, '').split("\n") //remove espaços e quebra linhas
+        const warehouseChecked = $('#warehousebox').val().replace( / /g, '').split("\n") //remove espaços e quebra linhas;
 
         const results = warehouseChecked.map(warehouse => {
           return warehouse.toString().substring(5, warehouse.indexOf('-'))
@@ -60,6 +62,7 @@
         return results
       }
       
+      //compara os vetores de operações warehouse/derroga;
       function compareOperations(warehouse, derroga) {
         derroga = derroga.split('\n') //transformando a derroga em vetor
         let xml = []
