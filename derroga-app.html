@@ -28,13 +28,28 @@
         const derroga = $('#derroga').val() //planilha de derroga;
 
         const cisValidated = cisHandler()
+        console.log(cisValidated)
         const whValidated = warehouseHandler()
-        
-        let opValidated = compareOperations(whValidated, derroga)
-        xmlValidated = createDerroga(opValidated, cisnum, resp)
+        console.log(whValidated);
 
-        $('#downloadlink').attr('href', createFile(xmlValidated))
-        $('#downloadlink').show()
+        cisValidated.forEach(cis => {
+          const opValidated = compareOperations(whValidated, derroga)
+            xmlValidated = createDerroga(opValidated, cis, resp)
+            $("#downloadlink").attr("download", cis + ".xml")
+            $('#downloadlink').attr('href', createFile(xmlValidated))
+            //$('#downloadlink').show()
+            $('#downloadlink').trigger('click')
+        })
+
+        // $('#downloadlink').show()
+        // $('#downloadlink').click(() => {
+        //   cisChecked.forEach(cis => {
+        //     const opValidated = compareOperations(whValidated, derroga)
+        //     xmlValidated = createDerroga(opValidated, cis, resp)
+        //     $("#downloadlink").attr("download", cis + ".xml")
+        //     $('#downloadlink').attr('href', createFile(xmlValidated))
+        //   })
+        // })
       })
 
       //transforma input de cis em vetor caso possua o separador "," e exibe erro caso tamanho do cis seja != de 7 carct;
@@ -105,10 +120,10 @@
         return window.URL.createObjectURL(data)
       }
 
-      $("#downloadlink").click(function() {
-        let cis = $('#cisnum').val()
-        $("#downloadlink").attr("download", cis+".xml")
-      })
+      // $("#downloadlink").click(function() {
+      //   let cis = $('#cisnum').val()
+      //   $("#downloadlink").attr("download", cis+".xml")
+      // })
     })
   </script>
 </body>
