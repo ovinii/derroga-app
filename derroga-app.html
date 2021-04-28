@@ -17,8 +17,8 @@
   <textarea name="warehousebox" id="warehousebox" style="width:200px;"></textarea>
   <label for="derroga" style="display:block;">Informe as operações derrogadas:</label>
   <textarea id="derroga" style="width:200px;"></textarea>
-  <button id="btn-xml" style="display:block;">Create XML</button></br>
-  <a download="" id="downloadlink" style="display:none;">Download</a>
+  <button id="btn-xml" style="display:block;">Download</button></br>
+  <!-- <a download="" id="downloadlink" style="display:none;">Download</a> -->
   <script>
     $(document).ready(function() {
       $('#btn-xml').click(function() {
@@ -32,14 +32,42 @@
         const whValidated = warehouseHandler()
         console.log(whValidated);
 
-        cisValidated.forEach(cis => {
-          const opValidated = compareOperations(whValidated, derroga)
-            xmlValidated = createDerroga(opValidated, cis, resp)
-            $("#downloadlink").attr("download", cis + ".xml")
-            $('#downloadlink').attr('href', createFile(xmlValidated))
-            //$('#downloadlink').show()
-            $('#downloadlink').trigger('click')
+        $('#btn-xml').click(function() {
+          cisValidated.forEach(cis => {
+            const opValidated = compareOperations(whValidated, derroga)
+            const xmlValidated = createDerroga(opValidated, cis, resp)
+
+            var a = document.createElement('a');
+            a.setAttribute('href', createFile(xmlValidated));
+            a.setAttribute('download', cis + ".xml");
+            var aj = $(a);
+            aj.appendTo('body');
+            aj[0].click();
+            aj.remove();
+          })
         })
+
+        // $('#btn-xml').click(function() {
+        //   console.log('cliquei xml')
+        
+        //   cisValidated.forEach(cis => {
+        //     const opValidated = compareOperations(whValidated, derroga)
+        //     const xmlValidated = createDerroga(opValidated, cis, resp)
+        //     $("#downloadlink").attr("download", cis + ".xml")
+        //     $('#downloadlink').attr('href', createFile(xmlValidated))
+        //     $('#downloadlink').trigger('click')
+        //     console.log('cliquei')
+        //   })
+        // })
+
+        // cisValidated.forEach(cis => {
+        //   const opValidated = compareOperations(whValidated, derroga)
+        //     xmlValidated = createDerroga(opValidated, cis, resp)
+        //     $("#downloadlink").attr("download", cis + ".xml")
+        //     $('#downloadlink').attr('href', createFile(xmlValidated))
+        //     $('#downloadlink').show()
+        //     $('#downloadlink').trigger('click')
+        // })
 
         // $('#downloadlink').show()
         // $('#downloadlink').click(() => {
