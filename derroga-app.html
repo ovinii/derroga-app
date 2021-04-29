@@ -25,29 +25,23 @@
   <script>
     $(document).ready(function() {
       $('#btn-xml').click(function() {
-        const cisnum = $('#cisnum').val() //cis;
-        const resp = $('#resp').val() //responsável;
-        const warehouse = $('#warehousebox').val() //ctrl-v da warehouse;
-        const derroga = $('#derroga').val() //planilha de derroga;
-        const status = $('input[name=result]:checked').val()
-
-        const cisValidated = cisHandler()
-        const whValidated = warehouseHandler()
+        const cisValidated = cisHandler() //lista de cis
+        const whValidated = warehouseHandler() //lista de operações wh
         
+        if(cisValidated !== "") {
+          cisValidated.forEach(cis => {
+            const opValidated = compareOperations(whValidated, $('#derroga').val())
+            const xmlValidated = createDerroga(opValidated, cis, $('#resp').val(), $('input[name=result]:checked').val())
 
-        cisValidated.forEach(cis => {
-          const opValidated = compareOperations(whValidated, derroga)
-          console.log('1:' + status);
-          const xmlValidated = createDerroga(opValidated, cis, resp, status)
-
-          var a = document.createElement('a');
-          a.setAttribute('href', createFile(xmlValidated))
-          a.setAttribute('download', cis + ".xml")
-          var aj = $(a)
-          aj.appendTo('body')
-          aj[0].click()
-          aj.remove()
-        })
+            var a = document.createElement('a');
+            a.setAttribute('href', createFile(xmlValidated))
+            a.setAttribute('download', cis + ".xml")
+            var aj = $(a)
+            aj.appendTo('body')
+            aj[0].click()
+            aj.remove()
+          })
+        }
       })
 
       //transforma input de cis em vetor caso possua o separador "," e exibe erro caso tamanho do cis seja != de 7 carct;
@@ -56,12 +50,10 @@
         cisChecked.forEach(cis => {
           if(cis.length !== 7) {
             $('#errMessage').attr('style', 'display:block; margin:0px; color:red;')
-            $('#errMessage').text("Cis inválido")
-            $('#cisnum').val("") 
-          }
-          
+            $('#errMessage').text("Um ou mais CIS inválidos")
+            $('#cisnum').val("")
+          }                                                                                                                                                                                                                                                                     
         })
-
         return cisChecked
       }
 
@@ -89,7 +81,6 @@
       }
       
       function createDerroga(operations, cisnum, resp, status) {
-        console.log(status);
         let op = checkedData(operations, resp, status)
         const d = new Date()
         // trata horário -adiciona 0 na frente quando hora/min/seg forem menor que 10
