@@ -27,7 +27,7 @@
       $('#btn-xml').click(function() {
         const cisValidated = cisHandler() //lista de cis
         const whValidated = warehouseHandler() //lista de operações wh
-        
+
         if(cisValidated !== "") {
           cisValidated.forEach(cis => {
             const opValidated = compareOperations(whValidated, $('#derroga').val())
@@ -47,13 +47,14 @@
       //transforma input de cis em vetor caso possua o separador "," e exibe erro caso tamanho do cis seja != de 7 carct;
       function cisHandler() {
         const cisChecked = $('#cisnum').val().split(',')
-        cisChecked.forEach(cis => {
+        for(const cis of cisChecked) {
           if(cis.length !== 7) {
+            $('#cisnum').val("")
             $('#errMessage').attr('style', 'display:block; margin:0px; color:red;')
             $('#errMessage').text("Um ou mais CIS inválidos")
-            $('#cisnum').val("")
-          }                                                                                                                                                                                                                                                                     
-        })
+            break;
+          }
+        }
         return cisChecked
       }
 
