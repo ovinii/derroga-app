@@ -32,7 +32,7 @@
           cisValidated.forEach(cis => {
             const opValidated = compareOperations(whValidated, $('#derroga').val())
             const xmlValidated = createDerroga(opValidated, cis, $('#resp').val(), $('input[name=result]:checked').val())
-
+            
             var a = document.createElement('a');
             a.setAttribute('href', createFile(xmlValidated))
             a.setAttribute('download', cis + ".xml")
