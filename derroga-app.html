@@ -46,12 +46,13 @@
 
       //transforma input de cis em vetor caso possua o separador "," e exibe erro caso tamanho do cis seja != de 7 carct;
       function cisHandler() {
-        const cisChecked = $('#cisnum').val().split(',')
+        const cisChecked = $('#cisnum').val().replace(/\s/g, '').split(',')
         for(const cis of cisChecked) {
           if(cis.length !== 7) {
             $('#cisnum').val("")
             $('#errMessage').attr('style', 'display:block; margin:0px; color:red;')
             $('#errMessage').text("Um ou mais CIS inválidos")
+            return ""
             break;
           }
         }
