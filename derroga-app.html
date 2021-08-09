@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>&#9889; derroga-app</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-  <style>body {zoom:80%}</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+    crossorigin="anonymous"></script>
 </head>
+
 <body>
+  <a href="massive-defects.html">massive-defects</a>
   <label for="cisnum" style="display:block;">Informe o CIS:</label>
   <input type="text" id="cisnum">
   <p id="errMessage" style="display:none"></p>
@@ -23,16 +27,16 @@
   <label for="nok">KO</label><br>
   <button id="btn-xml" style="display:block;margin-top:10px;">Download</button></>
   <script>
-    $(document).ready(function() {
-      $('#btn-xml').click(function() {
+    $(document).ready(function () {
+      $('#btn-xml').click(function () {
         const cisValidated = cisHandler() //lista de cis
         const whValidated = warehouseHandler() //lista de operações wh
 
-        if(cisValidated !== "") {
+        if (cisValidated !== "") {
           cisValidated.forEach(cis => {
             const opValidated = compareOperations(whValidated, $('#derroga').val())
             const xmlValidated = createDerroga(opValidated, cis, $('#resp').val(), $('input[name=result]:checked').val())
-            
+
             var a = document.createElement('a');
             a.setAttribute('href', createFile(xmlValidated))
             a.setAttribute('download', cis + ".xml")
@@ -47,8 +51,8 @@
       //transforma input de cis em vetor caso possua o separador "," e exibe erro caso tamanho do cis seja != de 7 carct;
       function cisHandler() {
         const cisChecked = $('#cisnum').val().replace(/\s/g, '').split(',')
-        for(const cis of cisChecked) {
-          if(cis.length !== 7) {
+        for (const cis of cisChecked) {
+          if (cis.length !== 7) {
             $('#cisnum').val("")
             $('#errMessage').attr('style', 'display:block; margin:0px; color:red;')
             $('#errMessage').text("Um ou mais CIS inválidos")
@@ -61,7 +65,7 @@
 
       //transforma input da warehouse removendo espaços e separando as operações em vetor;
       function warehouseHandler() {
-        const warehouseChecked = $('#warehousebox').val().replace( / /g, '').split("\n") //remove espaços e quebra linhas;
+        const warehouseChecked = $('#warehousebox').val().replace(/ /g, '').split("\n") //remove espaços e quebra linhas;
 
         const results = warehouseChecked.map(warehouse => {
           return warehouse.toString().substring(5, warehouse.indexOf('-'))
@@ -69,19 +73,19 @@
 
         return results
       }
-      
+
       //compara os vetores de operações warehouse/derroga;
       function compareOperations(warehouse, derroga) {
         derroga = derroga.split('\n') //transformando a derroga em vetor
         let xml = []
-        for(let operation of warehouse) {
-          if(derroga.indexOf(operation) != -1) { // busca operação na lista de derroga
+        for (let operation of warehouse) {
+          if (derroga.indexOf(operation) != -1) { // busca operação na lista de derroga
             xml.push(operation) // se houver um "match" insere a operação no xml
           }
         }
-          return xml
+        return xml
       }
-      
+
       function createDerroga(operations, cisnum, resp, status) {
         let op = checkedData(operations, resp, status)
         const d = new Date()
@@ -90,29 +94,30 @@
         let minutes = d.getMinutes() < '10' ? '0' + d.getMinutes() : d.getMinutes()
         let seconds = d.getSeconds() < '10' ? '0' + d.getSeconds() : d.getSeconds()
         // trata datas -adiciona 0 na frente quando mes/dia forem menor que 10
-        let month = d.getMonth()+1 < '10' ? '0' + parseInt(d.getMonth()+1) : d.getMonth()+1
+        let month = d.getMonth() + 1 < '10' ? '0' + parseInt(d.getMonth() + 1) : d.getMonth() + 1
         let day = d.getDate() < '10' ? '0' + d.getDate() : d.getDate()
 
         let header = `<FIELD_DATA CISNUM="${cisnum}" LINDES="ManualCorrection" MSG_DT="${d.getFullYear()}-${month}-${day}T${hours}:${minutes}:${seconds}">`
         let processing = `\n\t<PROCESSING_CHECK_SECTION>\n${op}\n\t</PROCESSING_CHECK_SECTION>`
         let footer = `\n</FIELD_DATA>`
-        
-        return header+processing+footer
+
+        return header + processing + footer
       }
 
       function checkedData(operations, resp, status) {
         let text = ""
-        for(let operation of operations) {
+        for (let operation of operations) {
           text += `\t\t<CHECKED_DATA OPCODE="${operation}" OPTYPE="GEN" OPERATOR="${resp}">${status}</CHECKED_DATA>\n`
         }
         return text
       }
 
       function createFile(file) {
-        const data = new Blob([file], {type:'text/xml'})
+        const data = new Blob([file], { type: 'text/xml' })
         return window.URL.createObjectURL(data)
       }
     })
   </script>
 </body>
+
 </html>

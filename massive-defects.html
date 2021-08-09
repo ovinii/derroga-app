@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+    crossorigin="anonymous"></script>
+  <title>massive-defects</title>
+</head>
+
+<body>
+  <p id="errMessage" style="display:none"></p>
+  <label for="cisnum" style="display:block;">Informe o CIS:</label>
+  <input type="text" id="cisnum">
+  <label for="tesis" style="display:block;">Informe o Tesis:</label>
+  <input type="text" id="tesis">
+  <br><input type="radio" id="open" name="result" value="100" checked>
+  <label for="open" style="margin-right:10px;">OPEN</label>
+  <input type="radio" id="close" name="result" value="0">
+  <label for="close">CLOSE</label><br>
+  <button id="btn-xml" style="display:block;margin-top:10px;">Download</button>
+
+  <script>
+    $(document).ready(function () {
+      $('#btn-xml').click(function () {
+        const cisList = cisHandler()
+
+        if (cisList !== "") {
+          cisList.forEach(cis => {
+            const xml = createXml(cis, $('#tesis').val(), $('input[name=result]:checked').val())
+
+            var a = document.createElement('a');
+            a.setAttribute('href', createFile(xml))
+            a.setAttribute('download', cis + ".xml")
+            var aj = $(a)
+            aj.appendTo('body')
+            aj[0].click()
+            aj.remove()
+          })
+        }
+      })
+
+      function cisHandler() {
+        const cisChecked = $('#cisnum').val().replace(/\s/g, '').split(',')
+        for (const cis of cisChecked) {
+          if (cis.length !== 7) {
+            $('#cisnum').val("")
+            $('#errMessage').attr('style', 'display:block; margin:0px; color:red;')
+            $('#errMessage').text("Um ou mais CIS inválidos")
+            return ""
+            break;
+          }
+        }
+        return cisChecked
+      }
+
+      function createXml(cisnum, tesis, status) {
+        const d = new Date()
+        let header = `<FIELD_DATA MSG_DT="${d.toISOString()}" CISNUM="${cisnum} ">`
+        let tesisDetail = `\t\t<TESIS_DETAIL TESIS_COMPLETE_CODE="${tesis}" QI4_SOURCE="TDF" TESIS_UPDATION_STATUS="true" TESIS_OPEN_DATE="${d.toISOString()}" CRITICITY="${status}" />`
+        let tesisComm = `\n\t<TESIS_COMMUNICATION>\n${tesisDetail}\n\t</TESIS_COMMUNICATION>`
+        let footer = `\n</FIELD_DATA>`
+
+        return header + tesisComm + footer
+      }
+
+      function createFile(file) {
+        const data = new Blob([file], { type: 'text/xml' })
+        return window.URL.createObjectURL(data)
+      }
+    })
+  </script>
+</body>
+
+</html>
